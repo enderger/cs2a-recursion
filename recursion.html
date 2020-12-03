@@ -1,0 +1,620 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2020-12-03 Thu 13:07 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Recursive Functions and Dynamic Programming</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Daniel Hutzley" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        displayAlign: "center",
+        displayIndent: "0em",
+
+        "HTML-CSS": { scale: 100,
+                        linebreaks: { automatic: "false" },
+                        webFont: "TeX"
+                       },
+        SVG: {scale: 100,
+              linebreaks: { automatic: "false" },
+              font: "TeX"},
+        NativeMML: {scale: 100},
+        TeX: { equationNumbers: {autoNumber: "AMS"},
+               MultLineWidth: "85%",
+               TagSide: "right",
+               TagIndent: ".8em"
+             }
+});
+</script>
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Recursive Functions and Dynamic Programming</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org2e7373d">1. Definitions</a></li>
+<li><a href="#org9433cbb">2. Examples</a>
+<ul>
+<li><a href="#org8450da7">2.1. Factorial</a></li>
+<li><a href="#orgc344cca">2.2. Recursive Fibonacci</a></li>
+<li><a href="#org120d3c9">2.3. Memoized Fibonacci</a></li>
+<li><a href="#org08b6d95">2.4. Dynamic Fibonacci</a></li>
+<li><a href="#org4a665f5">2.5. Main</a></li>
+<li><a href="#orgc533e04">2.6. Program Structure</a></li>
+</ul>
+</li>
+<li><a href="#org5342c7a">3. Benchmarks</a></li>
+</ul>
+</div>
+</div>
+<p>
+This document explains various uses of recursion and dynamic programming
+</p>
+<div id="outline-container-org2e7373d" class="outline-2">
+<h2 id="org2e7373d"><span class="section-number-2">1</span> Definitions</h2>
+<div class="outline-text-2" id="text-1">
+<dl class="org-dl">
+<dt>Recursive Function</dt><dd>A function which calls itself</dd>
+<dt>Linear Recursion</dt><dd>A function which recurs only once per call</dd>
+<dt>Memoization</dt><dd>A recursive function which caches some of it's values to save time</dd>
+<dt>Dynamic Programming</dt><dd>A form of programming which involves simplifying tasks into smaller subtasks</dd>
+</dl>
+</div>
+</div>
+
+<div id="outline-container-org9433cbb" class="outline-2">
+<h2 id="org9433cbb"><span class="section-number-2">2</span> Examples</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-org8450da7" class="outline-3">
+<h3 id="org8450da7"><span class="section-number-3">2.1</span> Factorial</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+This is a warm up and introduction to <b>recursion</b>. It calculates the factorial of a number using <b>linear recursion</b>.
+</p>
+
+<p>
+The mathematical representation of this function is:
+</p>
+\begin{equation}
+    f(x) =
+    \begin{cases}
+        1 &\mbox{if } x \leq 0 \\
+        x * f(x-1) &\mbox{if } x > 0
+    \end{cases}
+\end{equation}
+
+<p>
+Here is the code:
+</p>
+<div class="org-src-container">
+<pre class="src src-C++" id="orgea8c6a6"><span style="color: #c49619;">long</span> <span style="color: #c49619;">double</span>
+<span style="color: #3c98e0;">factorial</span>(<span style="color: #c49619;">int</span> <span style="color: #3c98e0;">n</span>)
+{
+    <span style="color: #93a61a; font-weight: bold;">return</span>
+        (n &lt;= 0)
+         ? 1
+         : n * factorial(n - 1)
+    ;
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgc344cca" class="outline-3">
+<h3 id="orgc344cca"><span class="section-number-3">2.2</span> Recursive Fibonacci</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+Now, on to the main event. Here, we will be making a function to calculate the nth Fibonacci Number.
+</p>
+
+<p>
+The mathematical representation of the Fibonacci Sequence is:
+</p>
+\begin{equation}
+fib_n =
+    \begin{cases}
+        1 &\mbox{if } x \leq 2 \\
+        fib_{n-1} + fib_{n-2} &\mbox{if } x > 2
+    \end{cases}
+\end{equation}
+
+<p>
+Here is the code:
+</p>
+<div class="org-src-container">
+<pre class="src src-C++" id="org2e23414"><span style="color: #c49619;">long</span> <span style="color: #c49619;">double</span>
+<span style="color: #3c98e0;">fibonacci_rec</span>(<span style="color: #c49619;">int</span> <span style="color: #3c98e0;">n</span>)
+{
+    <span style="color: #93a61a; font-weight: bold;">return</span>
+        (n&lt;=2)
+        ? 1
+        : fibonacci_rec(n-1) + fibonacci_rec(n-2)
+    ;
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org120d3c9" class="outline-3">
+<h3 id="org120d3c9"><span class="section-number-3">2.3</span> Memoized Fibonacci</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+While the previous function worked, it has a major problem: performance. For every increase in size of the requested number, we have to calculate every previous number in the sequence! To solve this, we can create a static cache which stores any value generated by the fibonacci function. This allows it to only calculate information it doesn't already have, a process known as <b>memoization</b>.
+</p>
+
+<p>
+Since this does not translate well into math, I'll write this in psudocode.
+</p>
+<div class="org-src-container">
+<pre class="src src-text">$cache := an array full of 0s
+
+fib :: integer $x
+function fib :=
+   if $cache[$x] = 0
+     $cache[$x] := fib($x - 1) + fib($x - 2)
+
+   return $cache[$x]
+end
+</pre>
+</div>
+
+<p>
+Here is the code:
+</p>
+<div class="org-src-container">
+<pre class="src src-C++" id="org2c61c2c"><span style="color: #c49619;">long</span> <span style="color: #c49619;">double</span>
+<span style="color: #3c98e0;">fibonacci_mem</span>(<span style="color: #c49619;">int</span> <span style="color: #3c98e0;">n</span>)
+{
+    <span style="color: #93a61a; font-weight: bold;">static</span> <span style="color: #3c98e0; font-weight: bold;">std</span>::<span style="color: #c49619;">vector</span>&lt;<span style="color: #c49619;">double</span>&gt; <span style="color: #3c98e0;">cache</span>(100,0);
+
+    <span style="color: #93a61a; font-weight: bold;">if</span>(cache[n] == 0)
+        cache[n] =
+            (n&lt;=2)
+            ? 1
+            : fibonacci_mem(n-1) + fibonacci_mem(n-2)
+        ;
+
+    <span style="color: #93a61a; font-weight: bold;">return</span> cache[n];
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org08b6d95" class="outline-3">
+<h3 id="org08b6d95"><span class="section-number-3">2.4</span> Dynamic Fibonacci</h3>
+<div class="outline-text-3" id="text-2-4">
+<p>
+While the <b>memoized</b> example was good, we can still do better. We can write this function non-recursively in order to prevent the overhead of calling a function by dividing it into 2 parts. This practice is <b>dynamic programming</b>.
+</p>
+
+<p>
+The psudocode for this function is
+</p>
+<div class="org-src-container">
+<pre class="src src-text">fib :: Integer $x
+function fib :=
+  $prev := 1; $prev2 := 1;
+
+  for ($i &lt;- 3..$x) do
+    $buf   := $prev2
+    $prev2 := $prev
+    $prev  := $buf + $prev2
+  end
+
+  return $prev
+end
+</pre>
+</div>
+
+<p>
+And the code is:
+</p>
+<div class="org-src-container">
+<pre class="src src-C++" id="org78d0aba"><span style="color: #c49619;">long</span> <span style="color: #c49619;">double</span>
+<span style="color: #3c98e0;">fibonacci_dyn</span>(<span style="color: #c49619;">int</span> <span style="color: #3c98e0;">n</span>)
+{
+    <span style="color: #c49619;">double</span> <span style="color: #3c98e0;">prev</span> = 1, <span style="color: #3c98e0;">prev2</span> = 1;
+
+    <span style="color: #93a61a; font-weight: bold;">for</span>(<span style="color: #c49619;">int</span> <span style="color: #3c98e0;">i</span> = 3; i &lt;= n; i++)
+    {
+        <span style="color: #c49619;">double</span> <span style="color: #3c98e0;">buf</span> = prev2;
+        prev2 = prev;
+        prev = buf + prev2;
+    }
+
+    <span style="color: #93a61a; font-weight: bold;">return</span> prev;
+}
+</pre>
+</div>
+
+<p>
+As you can see, we make the code calculate each number once and snake over the theoretical chain. This allows for linear execution time.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org4a665f5" class="outline-3">
+<h3 id="org4a665f5"><span class="section-number-3">2.5</span> Main</h3>
+<div class="outline-text-3" id="text-2-5">
+<p>
+Here, I'm including some code which will makes use of each of the above functions. This is also the code I used in the benchmarks.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C++" id="org99a950a"><span style="color: #62787f;">// </span><span style="color: #62787f;">I'm using macros here to define which function to benchmark without any overh</span><span style="color: #e2468f;">ead.</span>
+<span style="color: #3c98e0;">#define</span> <span style="color: #3c98e0;">fn</span>(<span style="color: #3c98e0;">n</span>) factorial(n)
+<span style="color: #62787f;">//</span><span style="color: #62787f;">#define fn(n) fibonacci_rec(n)</span>
+<span style="color: #62787f;">//</span><span style="color: #62787f;">#define fn(n) fibonacci_mem(n)</span>
+<span style="color: #62787f;">//</span><span style="color: #62787f;">#define fn(n) fibonacci_dyn(n)</span>
+
+<span style="color: #c49619;">int</span>
+<span style="color: #3c98e0;">main</span> ()
+{
+    <span style="color: #93a61a; font-weight: bold;">for</span>(<span style="color: #c49619;">int</span> <span style="color: #3c98e0;">i</span> = 1; i &lt;= 1000; i++)
+        <span style="color: #3c98e0; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #3cafa5;">"Function("</span> &lt;&lt; i &lt;&lt; <span style="color: #3cafa5;">") = "</span> &lt;&lt; fn(i) &lt;&lt; <span style="color: #3c98e0; font-weight: bold;">std</span>::endl;
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgc533e04" class="outline-3">
+<h3 id="orgc533e04"><span class="section-number-3">2.6</span> Program Structure</h3>
+<div class="outline-text-3" id="text-2-6">
+<p>
+This section shows how all of the above code comes together
+</p>
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #62787f;">//</span><span style="color: #62787f;">This file is the result of tangling recursion.org. For a breakdown of how this</span><span style="color: #e2468f;"> works, refer to it.</span>
+<span style="color: #3c98e0;">#include</span> <span style="color: #3cafa5;">&lt;iostream&gt;</span>
+<span style="color: #3c98e0;">#include</span> <span style="color: #3cafa5;">&lt;vector&gt;</span>
+
+<span style="color: #c49619;">long</span> <span style="color: #c49619;">double</span>
+<span style="color: #3c98e0;">factorial</span>(<span style="color: #c49619;">int</span> <span style="color: #3c98e0;">n</span>)
+{
+    <span style="color: #93a61a; font-weight: bold;">return</span>
+        (n &lt;= 0)
+         ? 1
+         : n * factorial(n - 1)
+    ;
+}
+<span style="color: #c49619;">long</span> <span style="color: #c49619;">double</span>
+<span style="color: #3c98e0;">fibonacci_rec</span>(<span style="color: #c49619;">int</span> <span style="color: #3c98e0;">n</span>)
+{
+    <span style="color: #93a61a; font-weight: bold;">return</span>
+        (n&lt;=2)
+        ? 1
+        : fibonacci_rec(n-1) + fibonacci_rec(n-2)
+    ;
+}
+<span style="color: #c49619;">long</span> <span style="color: #c49619;">double</span>
+<span style="color: #3c98e0;">fibonacci_mem</span>(<span style="color: #c49619;">int</span> <span style="color: #3c98e0;">n</span>)
+{
+    <span style="color: #93a61a; font-weight: bold;">static</span> <span style="color: #3c98e0; font-weight: bold;">std</span>::<span style="color: #c49619;">vector</span>&lt;<span style="color: #c49619;">double</span>&gt; <span style="color: #3c98e0;">cache</span>(100,0);
+
+    <span style="color: #93a61a; font-weight: bold;">if</span>(cache[n] == 0)
+        cache[n] =
+            (n&lt;=2)
+            ? 1
+            : fibonacci_mem(n-1) + fibonacci_mem(n-2)
+        ;
+
+    <span style="color: #93a61a; font-weight: bold;">return</span> cache[n];
+}
+<span style="color: #c49619;">long</span> <span style="color: #c49619;">double</span>
+<span style="color: #3c98e0;">fibonacci_dyn</span>(<span style="color: #c49619;">int</span> <span style="color: #3c98e0;">n</span>)
+{
+    <span style="color: #c49619;">double</span> <span style="color: #3c98e0;">prev</span> = 1, <span style="color: #3c98e0;">prev2</span> = 1;
+
+    <span style="color: #93a61a; font-weight: bold;">for</span>(<span style="color: #c49619;">int</span> <span style="color: #3c98e0;">i</span> = 3; i &lt;= n; i++)
+    {
+        <span style="color: #c49619;">double</span> <span style="color: #3c98e0;">buf</span> = prev2;
+        prev2 = prev;
+        prev = buf + prev2;
+    }
+
+    <span style="color: #93a61a; font-weight: bold;">return</span> prev;
+}
+<span style="color: #62787f;">// </span><span style="color: #62787f;">I'm using macros here to define which function to benchmark without any overh</span><span style="color: #e2468f;">ead.</span>
+<span style="color: #3c98e0;">#define</span> <span style="color: #3c98e0;">fn</span>(<span style="color: #3c98e0;">n</span>) factorial(n)
+<span style="color: #62787f;">//</span><span style="color: #62787f;">#define fn(n) fibonacci_rec(n)</span>
+<span style="color: #62787f;">//</span><span style="color: #62787f;">#define fn(n) fibonacci_mem(n)</span>
+<span style="color: #62787f;">//</span><span style="color: #62787f;">#define fn(n) fibonacci_dyn(n)</span>
+
+<span style="color: #c49619;">int</span>
+<span style="color: #3c98e0;">main</span> ()
+{
+    <span style="color: #93a61a; font-weight: bold;">for</span>(<span style="color: #c49619;">int</span> <span style="color: #3c98e0;">i</span> = 1; i &lt;= 1000; i++)
+        <span style="color: #3c98e0; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #3cafa5;">"Function("</span> &lt;&lt; i &lt;&lt; <span style="color: #3cafa5;">") = "</span> &lt;&lt; fn(i) &lt;&lt; <span style="color: #3c98e0; font-weight: bold;">std</span>::endl;
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org5342c7a" class="outline-2">
+<h2 id="org5342c7a"><span class="section-number-2">3</span> Benchmarks</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+As mentioned previously, I have done benchmarks on each of the aforementioned functions run on a dataset of 1 to 1000 (excluding the recursive implementation, which is stopped at 50 for time reasons). This is to show the performance gained from using <b>memoization</b> and <b>dynamic programming</b>.
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Function</th>
+<th scope="col" class="org-right">Time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Factorial</td>
+<td class="org-right">0:0.18</td>
+</tr>
+
+<tr>
+<td class="org-left">Recursive</td>
+<td class="org-right">2:11.12</td>
+</tr>
+
+<tr>
+<td class="org-left">Memoized</td>
+<td class="org-right">0:00.16</td>
+</tr>
+
+<tr>
+<td class="org-left">Dynamic</td>
+<td class="org-right">0.00.18</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+As you can see, memoization and dynamic programming both produce much faster code than the non-optimized recursive implementation.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: Daniel Hutzley</p>
+<p class="date">Created: 2020-12-03 Thu 13:07</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
