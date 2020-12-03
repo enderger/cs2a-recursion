@@ -1,2 +1,2 @@
 # Recursion Demos
-Please see [this](./recursion.org) for more info.
+Please see [this](./recursion.html) for more info.
